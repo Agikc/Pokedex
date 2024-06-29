@@ -2,42 +2,48 @@ import requests
 import PIL.Image as pl
 from urllib.request import urlopen
 import customtkinter as s
+from pathlib import Path
 
-eevee_triste = r"C:\Users\Miguel\Downloads\eevee.png"
-icon_pokedex = r"C:\Users\Miguel\Codigos_python\Pokedex\ico_pokedex.ico"
+create_path = lambda dir, path: dir / Path('assets') / path
+dir = Path(__file__).parent.resolve()
+reparar = create_path(dir,'reparar.png')
 
 class Pokedex():
-
+  """
+  Classe para interagir com a API da PokeAPI.
+  """
   def valid_api(self):
     try:
       self.api = requests.get(f'https://pokeapi.co/api/v2/pokemon/')
       return True
-    
     except:
-      return False
+        return False
 
   def api_poke(self,pokemon):
+    """
+    Função que buscar o Pokemon, Requisitado
+    """
     self.pokemon = pokemon
     self.apipoke = requests.get(f'https://pokeapi.co/api/v2/pokemon/{self.pokemon.lower()}')
     self.poke = self.apipoke.json()
     return self.poke
 
-  def getid(self,poke):
+  def get_id(self,poke):
     self.id = self.poke['id']
     return self.id
 
-  def getimg(self,id):
+  def get_img(self,id):
     link = f'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/{id}.png'
     img = pl.open(urlopen(link))
     img2 = s.CTkImage(img,size=(150,150))
     return img2
 
-  def getname(self,poke):
+  def get_name(self,poke):
     self.nome = self.poke['name']
     self.nome = self.nome.capitalize()
     return self.nome
 
-  def gettype(self,poke):
+  def get_type(self,poke):
       self.types = self.poke['types']
       match len(self.types):
         case 1:
@@ -49,7 +55,7 @@ class Pokedex():
           self.type2 = self.types[1]['type']['name']
           return f'Tipos: {self.type1.capitalize()} | {self.type2.capitalize()}'
           
-  def getability(self,poke):
+  def get_ability(self,poke):
     self.abilities = self.poke['abilities']
     match len(self.abilities):
       case 3: 
@@ -65,7 +71,7 @@ class Pokedex():
         self.ability1 = self.abilities[0]["ability"]["name"]
         return  f'  Habilidades: {self.ability1.capitalize()}  '
 
-  def getstatus(self,poke):
+  def get_status(self,poke):
       self.status = self.poke["stats"]
       self.hp = self.status[0]['base_stat']
       self.attack = self.status[1]['base_stat']
@@ -84,10 +90,9 @@ class Pokedex():
       return top,main
     except:
       error = s.CTkToplevel(window,relief='flat')
-      error.iconbitmap(icon_pokedex)
       error.title("Pokedex")
       error.geometry("250x150")
       error.resizable(False, False)
-      eevee = s.CTkImage(pl.open(eevee_triste),size=(100,100))
-      label_eevee = s.CTkLabel(error,image=eevee,text="").pack()
+      eevee = s.CTkImage(pl.open(reparar),size=(90,90))
+      label_eevee = s.CTkLabel(error,image=eevee,text="").pack(padx=10,pady=10)
       label_aviso = s.CTkLabel(error,text="Error de Digitação",font=("Cambria",20)).pack()
